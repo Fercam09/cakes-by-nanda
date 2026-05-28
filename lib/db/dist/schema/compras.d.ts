@@ -1,0 +1,122 @@
+import { z } from "zod/v4";
+export declare const comprasTable: import("drizzle-orm/pg-core").PgTableWithColumns<{
+    name: "compras";
+    schema: undefined;
+    columns: {
+        id: import("drizzle-orm/pg-core").PgColumn<{
+            name: "id";
+            tableName: "compras";
+            dataType: "number";
+            columnType: "PgSerial";
+            data: number;
+            driverParam: number;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: true;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        nombre: import("drizzle-orm/pg-core").PgColumn<{
+            name: "nombre";
+            tableName: "compras";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        cantidad: import("drizzle-orm/pg-core").PgColumn<{
+            name: "cantidad";
+            tableName: "compras";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        comprado: import("drizzle-orm/pg-core").PgColumn<{
+            name: "comprado";
+            tableName: "compras";
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        notas: import("drizzle-orm/pg-core").PgColumn<{
+            name: "notas";
+            tableName: "compras";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        createdAt: import("drizzle-orm/pg-core").PgColumn<{
+            name: "created_at";
+            tableName: "compras";
+            dataType: "date";
+            columnType: "PgTimestamp";
+            data: Date;
+            driverParam: string;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+    };
+    dialect: "pg";
+}>;
+export declare const insertCompraSchema: z.ZodObject<{
+    notas: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    nombre: z.ZodString;
+    cantidad: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    comprado: z.ZodOptional<z.ZodBoolean>;
+}, {
+    out: {};
+    in: {};
+}>;
+export type InsertCompra = z.infer<typeof insertCompraSchema>;
+export type Compra = typeof comprasTable.$inferSelect;
+//# sourceMappingURL=compras.d.ts.map

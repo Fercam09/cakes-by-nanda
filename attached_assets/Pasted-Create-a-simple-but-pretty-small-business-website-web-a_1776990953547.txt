@@ -1,0 +1,193 @@
+Create a simple but pretty small business website/web app for my mini cake business. The app should be in Spanish and designed for a teenage entrepreneur selling small packaged cakes during school vacation.
+
+The purpose of the app is NOT just to show information. It should mainly work as an internal order management system that I can use myself to organize customers, orders, recipes, prices, and production status.
+
+Build it as a clean, modern, mobile-friendly website with a soft, cute, bakery-style design. Make it simple to use, visually organized, and easy to update.
+
+Main requirements:
+
+1. Dashboard / Home
+
+- Show a summary with:
+
+  - total active orders
+
+  - total completed orders
+
+  - total money pending to collect
+
+  - total sales
+
+- Show quick cards for today’s pending orders and urgent tasks.
+
+2. Orders section
+
+Create a full order management page where I can:
+
+- Add a new order
+
+- Edit an existing order
+
+- Delete an order
+
+- View all orders in a table or cards
+
+Each order should include:
+
+- customer name
+
+- phone number or contact
+
+- order date
+
+- delivery date
+
+- products ordered
+
+- quantity of each product
+
+- unit price
+
+- total price
+
+- payment status (pending / paid)
+
+- order status (pending / in progress / baked / packed / delivered)
+
+- notes
+
+Add filters so I can sort or filter orders by:
+
+- pending
+
+- completed
+
+- paid
+
+- unpaid
+
+- delivery date
+
+3. Products and prices section
+
+Create a section where I can manage my cake flavors/products.
+
+For each product include:
+
+- product name
+
+- short description
+
+- price per unit
+
+- optional image
+
+- whether it is available or unavailable
+
+Allow me to add, edit, and delete products.
+
+4. Recipes section
+
+Create a private recipe organizer section.
+
+For each recipe include:
+
+- recipe name
+
+- ingredients
+
+- quantities
+
+- preparation steps
+
+- estimated yield (how many mini cakes it makes)
+
+- estimated cost to make
+
+- notes
+
+I want this section to help me keep my recipes organized, not public for customers.
+
+5. Cost and profit helper
+
+Add a section where I can calculate:
+
+- ingredient cost
+
+- packaging cost
+
+- total production cost
+
+- suggested selling price
+
+- profit per unit
+
+- profit per order
+
+6. Production checklist
+
+Create a checklist area for production where I can mark:
+
+- batter made
+
+- baked
+
+- cooled
+
+- decorated
+
+- packed
+
+- ready for delivery
+
+7. Calendar or delivery planner
+
+Add a simple calendar view or delivery planner so I can see which orders are due each day.
+
+8. Data persistence
+
+Use local storage or a simple database so my data stays saved when I close and reopen the app.
+
+9. Design
+
+- Use a cute bakery aesthetic
+
+- Soft colors
+
+- Clean layout
+
+- Rounded buttons/cards
+
+- Easy to read
+
+- Works well on phone and laptop
+
+- Entire interface in Spanish
+
+10. Technical preferences
+
+- Keep the code simple and well organized
+
+- Add comments so a beginner can understand the code
+
+- If possible, use React for the frontend
+
+- Make the app easy to improve later
+
+- Include sample demo data so I can understand how it works at first
+
+11. Extra useful features
+
+If possible, also add:
+
+- search bar for customer names
+
+- automatic total calculation
+
+- “mark as completed” button
+
+- export orders summary
+
+- low stock or ingredient reminder section
+
+Give me the full working project code and explain where each main file goes.

@@ -1,0 +1,1762 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Mini Pastelería - Sistema de gestión
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: pedidos
+    description: Order management
+  - name: productos
+    description: Product management
+  - name: recetas
+    description: Recipe management
+  - name: costos
+    description: Cost calculations
+  - name: produccion
+    description: Production checklists
+  - name: dashboard
+    description: Dashboard summaries
+  - name: compras
+    description: Shopping list
+  - name: gastos
+    description: Monthly expenses tracking
+  - name: costeos
+    description: Saved costing calculations per recipe
+  - name: publico
+    description: Public endpoints for customer-facing portal
+  - name: configuracion
+    description: App configuration (sinpe, etc.)
+  - name: ingredientes
+    description: Ingredient catalog (purchase prices and units)
+  - name: fechas
+    description: Blocked dates (days the bakery cannot deliver)
+  - name: storage
+    description: Object storage upload + serving
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── PEDIDOS ──────────────────────────────────────────────────────────
+  /pedidos:
+    get:
+      operationId: listPedidos
+      tags: [pedidos]
+      summary: List all orders
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pendiente, en_progreso, horneado, empacado, entregado]
+        - name: pago
+          in: query
+          schema:
+            type: string
+            enum: [pendiente, pagado]
+        - name: busqueda
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pedido"
+    post:
+      operationId: createPedido
+      tags: [pedidos]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePedidoBody"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+
+  /pedidos/{id}:
+    get:
+      operationId: getPedido
+      tags: [pedidos]
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+        "404":
+          description: Not found
+    put:
+      operationId: updatePedido
+      tags: [pedidos]
+      summary: Update an order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePedidoBody"
+      responses:
+        "200":
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+    delete:
+      operationId: deletePedido
+      tags: [pedidos]
+      summary: Delete an order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /pedidos/{id}/estado:
+    patch:
+      operationId: updatePedidoEstado
+      tags: [pedidos]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEstadoBody"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+
+  # ── PRODUCTOS ─────────────────────────────────────────────────────────
+  /productos:
+    get:
+      operationId: listProductos
+      tags: [productos]
+      summary: List all products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Producto"
+    post:
+      operationId: createProducto
+      tags: [productos]
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductoBody"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Producto"
+
+  /productos/{id}:
+    get:
+      operationId: getProducto
+      tags: [productos]
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Producto"
+    put:
+      operationId: updateProducto
+      tags: [productos]
+      summary: Update a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductoBody"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Producto"
+    delete:
+      operationId: deleteProducto
+      tags: [productos]
+      summary: Delete a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── RECETAS ───────────────────────────────────────────────────────────
+  /recetas:
+    get:
+      operationId: listRecetas
+      tags: [recetas]
+      summary: List all recipes
+      responses:
+        "200":
+          description: List of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Receta"
+    post:
+      operationId: createReceta
+      tags: [recetas]
+      summary: Create a new recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRecetaBody"
+      responses:
+        "201":
+          description: Recipe created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Receta"
+
+  /recetas/{id}:
+    get:
+      operationId: getReceta
+      tags: [recetas]
+      summary: Get recipe by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Recipe details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Receta"
+    put:
+      operationId: updateReceta
+      tags: [recetas]
+      summary: Update a recipe
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRecetaBody"
+      responses:
+        "200":
+          description: Recipe updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Receta"
+    delete:
+      operationId: deleteReceta
+      tags: [recetas]
+      summary: Delete a recipe
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── PRODUCCION ────────────────────────────────────────────────────────
+  /produccion:
+    get:
+      operationId: listProduccion
+      tags: [produccion]
+      summary: List production checklists
+      responses:
+        "200":
+          description: Production checklists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Produccion"
+    post:
+      operationId: createProduccion
+      tags: [produccion]
+      summary: Create production checklist for an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduccionBody"
+      responses:
+        "201":
+          description: Checklist created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Produccion"
+
+  /produccion/{id}:
+    put:
+      operationId: updateProduccion
+      tags: [produccion]
+      summary: Update production checklist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduccionBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Produccion"
+
+  # ── COMPRAS (lista del super) ─────────────────────────────────────────
+  /compras:
+    get:
+      operationId: listCompras
+      tags: [compras]
+      summary: List shopping list items
+      responses:
+        "200":
+          description: Items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Compra"
+    post:
+      operationId: createCompra
+      tags: [compras]
+      summary: Add an item to the shopping list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompraBody"
+      responses:
+        "201":
+          description: Item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Compra"
+
+  /compras/{id}:
+    put:
+      operationId: updateCompra
+      tags: [compras]
+      summary: Update a shopping list item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompraBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Compra"
+    delete:
+      operationId: deleteCompra
+      tags: [compras]
+      summary: Delete a shopping list item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── GASTOS ────────────────────────────────────────────────────────────
+  /gastos:
+    get:
+      operationId: listGastos
+      tags: [gastos]
+      summary: List expenses, optionally filtered by month
+      parameters:
+        - name: mes
+          in: query
+          description: Filter by month in YYYY-MM format
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Gasto"
+    post:
+      operationId: createGasto
+      tags: [gastos]
+      summary: Add an expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGastoBody"
+      responses:
+        "201":
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Gasto"
+
+  /gastos/{id}:
+    delete:
+      operationId: deleteGasto
+      tags: [gastos]
+      summary: Delete an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /gastos/resumen:
+    get:
+      operationId: getGastosResumen
+      tags: [gastos]
+      summary: Get monthly profit/loss summary (sales - expenses)
+      parameters:
+        - name: mes
+          in: query
+          description: Month in YYYY-MM format. Defaults to current month.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Monthly financial summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GastosResumen"
+
+  # ── CONFIGURACION ─────────────────────────────────────────────────────
+  /configuracion:
+    get:
+      operationId: getConfiguracion
+      tags: [configuracion]
+      summary: Get app configuration (sinpe info, etc.)
+      responses:
+        "200":
+          description: Configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Configuracion"
+    put:
+      operationId: updateConfiguracion
+      tags: [configuracion]
+      summary: Update app configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Configuracion"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Configuracion"
+  /configuracion/pasos:
+    put:
+      operationId: updatePasosCompletados
+      tags: [configuracion]
+      summary: Update launch checklist completion state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: boolean
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+
+  # ── INGREDIENTES STOCK ────────────────────────────────────────────────
+  /ingredientes/{id}/stock:
+    patch:
+      operationId: ajustarStockIngrediente
+      tags: [ingredientes]
+      summary: Adjust stock by a delta amount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AjustarStockBody"
+      responses:
+        "200":
+          description: Stock updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingrediente"
+
+  # ── FECHAS BLOQUEADAS ─────────────────────────────────────────────────
+  /fechas-bloqueadas:
+    get:
+      operationId: listFechasBloqueadas
+      tags: [fechas]
+      summary: List blocked delivery dates
+      responses:
+        "200":
+          description: List of blocked dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FechaBloqueada"
+    post:
+      operationId: createFechaBloqueada
+      tags: [fechas]
+      summary: Block a delivery date
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFechaBloqueadaBody"
+      responses:
+        "201":
+          description: Date blocked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FechaBloqueada"
+
+  /fechas-bloqueadas/{fecha}:
+    delete:
+      operationId: deleteFechaBloqueada
+      tags: [fechas]
+      summary: Unblock a delivery date
+      parameters:
+        - name: fecha
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "204":
+          description: Unblocked
+
+  # ── STORAGE ───────────────────────────────────────────────────────────
+  /storage/uploads/request-url:
+    post:
+      tags: [storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+        '400':
+          description: Missing or invalid required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  # ── PUBLICO (customer-facing) ─────────────────────────────────────────
+  /publico/menu:
+    get:
+      operationId: getMenuPublico
+      tags: [publico]
+      summary: Public menu — only active products + sinpe info
+      responses:
+        "200":
+          description: Public menu
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuPublico"
+
+  /publico/pedidos:
+    post:
+      operationId: createPedidoPublico
+      tags: [publico]
+      summary: Create an order from the public site (enters as pendiente_aprobacion)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePedidoPublicoBody"
+      responses:
+        "201":
+          description: Pedido created with slug
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slug:
+                    type: string
+                  id:
+                    type: integer
+                required: [slug, id]
+
+  /publico/pedidos/{slug}:
+    get:
+      operationId: getPedidoPublico
+      tags: [publico]
+      summary: Get an order's status by slug (sanitized)
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Pedido status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PedidoPublico"
+
+  /publico/pedidos/{slug}/comprobante:
+    post:
+      operationId: setComprobantePublico
+      tags: [publico]
+      summary: Customer marks Sinpe sent and provides reference
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                referenciaSinpe:
+                  type: string
+              required: [referenciaSinpe]
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PedidoPublico"
+
+  # ── PEDIDOS (admin moderation) ────────────────────────────────────────
+  /pedidos/{id}/aprobar:
+    post:
+      operationId: aprobarPedido
+      tags: [pedidos]
+      summary: Approve a customer-submitted pedido
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+
+  /pedidos/{id}/rechazar:
+    post:
+      operationId: rechazarPedido
+      tags: [pedidos]
+      summary: Reject a customer-submitted pedido
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+
+  # ── COSTEOS ───────────────────────────────────────────────────────────
+  /costeos:
+    get:
+      operationId: listCosteos
+      tags: [costeos]
+      summary: List all saved costings
+      responses:
+        "200":
+          description: List of costings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Costeo"
+    post:
+      operationId: createCosteo
+      tags: [costeos]
+      summary: Save a new costing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCosteoBody"
+      responses:
+        "201":
+          description: Costing created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Costeo"
+
+  /costeos/{id}:
+    put:
+      operationId: updateCosteo
+      tags: [costeos]
+      summary: Update a costing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCosteoBody"
+      responses:
+        "200":
+          description: Costing updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Costeo"
+    delete:
+      operationId: deleteCosteo
+      tags: [costeos]
+      summary: Delete a costing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── INGREDIENTES ──────────────────────────────────────────────────────
+  /ingredientes:
+    get:
+      operationId: listIngredientes
+      tags: [ingredientes]
+      summary: List all ingredients in the catalog
+      responses:
+        "200":
+          description: List of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ingrediente"
+    post:
+      operationId: createIngrediente
+      tags: [ingredientes]
+      summary: Add a new ingredient to the catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIngredienteBody"
+      responses:
+        "201":
+          description: Ingredient created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingrediente"
+
+  /ingredientes/{id}:
+    put:
+      operationId: updateIngrediente
+      tags: [ingredientes]
+      summary: Update an ingredient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIngredienteBody"
+      responses:
+        "200":
+          description: Ingredient updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingrediente"
+    delete:
+      operationId: deleteIngrediente
+      tags: [ingredientes]
+      summary: Delete an ingredient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "409":
+          description: Conflict, ingredient is in use by one or more costeos
+
+  # ── DASHBOARD ─────────────────────────────────────────────────────────
+  /dashboard/resumen:
+    get:
+      operationId: getDashboardResumen
+      tags: [dashboard]
+      summary: Get dashboard summary statistics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResumen"
+
+  /dashboard/pedidos-hoy:
+    get:
+      operationId: getPedidosHoy
+      tags: [dashboard]
+      summary: Get today's orders and urgent deliveries
+      responses:
+        "200":
+          description: Today's orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pedido"
+
+  /dashboard/calendario:
+    get:
+      operationId: getCalendario
+      tags: [dashboard]
+      summary: Get orders grouped by delivery date for calendar view
+      responses:
+        "200":
+          description: Orders by date
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalendarioDia"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombreCliente:
+          type: string
+        telefono:
+          type: string
+        fechaPedido:
+          type: string
+          format: date
+        fechaEntrega:
+          type: string
+          format: date
+        productos:
+          type: string
+          description: JSON array of {nombre, cantidad, precioUnitario}
+        totalPrecio:
+          type: number
+        estadoPago:
+          type: string
+          enum: [pendiente, pagado]
+        estadoPedido:
+          type: string
+          enum: [pendiente, en_progreso, horneado, empacado, entregado]
+        notas:
+          type: string
+        metodoPago:
+          type: string
+          enum: [sinpe, efectivo]
+        referenciaSinpe:
+          type: string
+          nullable: true
+        origenCliente:
+          type: string
+          nullable: true
+        slug:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - nombreCliente
+        - telefono
+        - fechaPedido
+        - fechaEntrega
+        - productos
+        - totalPrecio
+        - estadoPago
+        - estadoPedido
+        - metodoPago
+
+    CreatePedidoBody:
+      type: object
+      properties:
+        nombreCliente:
+          type: string
+        telefono:
+          type: string
+        fechaPedido:
+          type: string
+          format: date
+        fechaEntrega:
+          type: string
+          format: date
+        productos:
+          type: string
+          description: JSON array of {nombre, cantidad, precioUnitario}
+        totalPrecio:
+          type: number
+        estadoPago:
+          type: string
+          enum: [pendiente, pagado]
+        estadoPedido:
+          type: string
+          enum: [pendiente, en_progreso, horneado, empacado, entregado]
+        notas:
+          type: string
+        metodoPago:
+          type: string
+          enum: [sinpe, efectivo]
+      required:
+        - nombreCliente
+        - telefono
+        - fechaPedido
+        - fechaEntrega
+        - productos
+        - totalPrecio
+        - estadoPago
+        - estadoPedido
+
+    UpdateEstadoBody:
+      type: object
+      properties:
+        estadoPedido:
+          type: string
+          enum: [pendiente, en_progreso, horneado, empacado, entregado]
+        estadoPago:
+          type: string
+          enum: [pendiente, pagado]
+      required: []
+
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        disponible:
+          type: boolean
+        imagen:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - nombre
+        - precio
+        - disponible
+
+    CreateProductoBody:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        disponible:
+          type: boolean
+        imagen:
+          type: string
+      required:
+        - nombre
+        - precio
+        - disponible
+
+    Receta:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        ingredientes:
+          type: string
+          description: JSON array of {nombre, cantidad, unidad}
+        pasos:
+          type: string
+          nullable: true
+          description: JSON array of steps
+        rendimiento:
+          type: integer
+          nullable: true
+          description: How many mini cakes it makes
+        costoEstimado:
+          type: number
+          nullable: true
+        tiempoHorno:
+          type: string
+          nullable: true
+          description: Cooking time in oven (e.g. "35 min")
+        notas:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - nombre
+        - ingredientes
+        - pasos
+        - rendimiento
+        - costoEstimado
+
+    CreateRecetaBody:
+      type: object
+      properties:
+        nombre:
+          type: string
+        ingredientes:
+          type: string
+        pasos:
+          type: string
+          nullable: true
+        rendimiento:
+          type: integer
+          nullable: true
+        costoEstimado:
+          type: number
+          nullable: true
+        tiempoHorno:
+          type: string
+          nullable: true
+        notas:
+          type: string
+          nullable: true
+      required:
+        - nombre
+        - ingredientes
+
+    Produccion:
+      type: object
+      properties:
+        id:
+          type: integer
+        pedidoId:
+          type: integer
+        ingredientesListos:
+          type: boolean
+        masaLista:
+          type: boolean
+        horneado:
+          type: boolean
+        enfriado:
+          type: boolean
+        decorado:
+          type: boolean
+        empacado:
+          type: boolean
+        listoParaEntregar:
+          type: boolean
+        notas:
+          type: string
+      required:
+        - id
+        - pedidoId
+        - ingredientesListos
+        - masaLista
+        - horneado
+        - enfriado
+        - decorado
+        - empacado
+        - listoParaEntregar
+
+    CreateProduccionBody:
+      type: object
+      properties:
+        pedidoId:
+          type: integer
+        ingredientesListos:
+          type: boolean
+        masaLista:
+          type: boolean
+        horneado:
+          type: boolean
+        enfriado:
+          type: boolean
+        decorado:
+          type: boolean
+        empacado:
+          type: boolean
+        listoParaEntregar:
+          type: boolean
+        notas:
+          type: string
+      required:
+        - pedidoId
+
+    Compra:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        cantidad:
+          type: string
+          nullable: true
+        comprado:
+          type: boolean
+        notas:
+          type: string
+          nullable: true
+      required:
+        - id
+        - nombre
+        - comprado
+
+    Gasto:
+      type: object
+      properties:
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        categoria:
+          type: string
+        descripcion:
+          type: string
+        monto:
+          type: number
+        notas:
+          type: string
+          nullable: true
+      required:
+        - id
+        - fecha
+        - categoria
+        - descripcion
+        - monto
+
+    CreateGastoBody:
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+        categoria:
+          type: string
+        descripcion:
+          type: string
+        monto:
+          type: number
+        notas:
+          type: string
+          nullable: true
+      required:
+        - fecha
+        - categoria
+        - descripcion
+        - monto
+
+    GastosResumen:
+      type: object
+      properties:
+        mes:
+          type: string
+        ventas:
+          type: number
+        gastos:
+          type: number
+        ganancia:
+          type: number
+        gastosPorCategoria:
+          type: array
+          items:
+            type: object
+            properties:
+              categoria:
+                type: string
+              total:
+                type: number
+            required:
+              - categoria
+              - total
+      required:
+        - mes
+        - ventas
+        - gastos
+        - ganancia
+        - gastosPorCategoria
+
+    Configuracion:
+      type: object
+      properties:
+        numeroSinpe:
+          type: string
+          nullable: true
+        nombreSinpe:
+          type: string
+          nullable: true
+        instruccionesSinpe:
+          type: string
+          nullable: true
+        mensajeBienvenida:
+          type: string
+          nullable: true
+
+    MenuPublico:
+      type: object
+      properties:
+        productos:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              nombre: { type: string }
+              descripcion: { type: string, nullable: true }
+              precio: { type: number }
+              disponible: { type: boolean }
+              imagen: { type: string, nullable: true }
+            required: [id, nombre, precio, disponible]
+        configuracion:
+          $ref: "#/components/schemas/Configuracion"
+        nombreNegocio:
+          type: string
+        fechasBloqueadas:
+          type: array
+          items:
+            type: string
+            format: date
+      required: [productos, configuracion, nombreNegocio, fechasBloqueadas]
+
+    CreatePedidoPublicoBody:
+      type: object
+      properties:
+        nombreCliente: { type: string }
+        telefono: { type: string }
+        fechaEntrega: { type: string, format: date }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productoId: { type: integer }
+              cantidad: { type: integer, minimum: 1 }
+            required: [productoId, cantidad]
+        notas: { type: string, nullable: true }
+        metodoPago:
+          type: string
+          enum: [sinpe, efectivo]
+      required: [nombreCliente, telefono, fechaEntrega, items]
+
+    PedidoPublico:
+      type: object
+      properties:
+        slug: { type: string }
+        nombreCliente: { type: string }
+        telefono: { type: string }
+        fechaPedido: { type: string, format: date }
+        fechaEntrega: { type: string, format: date }
+        productos: { type: string }
+        totalPrecio: { type: number }
+        estadoPago: { type: string }
+        estadoPedido: { type: string }
+        metodoPago: { type: string, enum: [sinpe, efectivo] }
+        notas: { type: string, nullable: true }
+        referenciaSinpe: { type: string, nullable: true }
+        configuracion:
+          $ref: "#/components/schemas/Configuracion"
+        produccion:
+          type: object
+          nullable: true
+          properties:
+            masaLista: { type: boolean }
+            horneado: { type: boolean }
+            decorado: { type: boolean }
+            empacado: { type: boolean }
+            entregado: { type: boolean }
+      required:
+        - slug
+        - nombreCliente
+        - telefono
+        - fechaPedido
+        - fechaEntrega
+        - productos
+        - totalPrecio
+        - estadoPago
+        - estadoPedido
+        - configuracion
+
+    Costeo:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        costoIngredientes:
+          type: number
+        costoEmpaque:
+          type: number
+        otrosCostos:
+          type: number
+        cantidad:
+          type: integer
+        margenGanancia:
+          type: number
+        lineas:
+          type: array
+          items:
+            $ref: "#/components/schemas/CosteoLinea"
+      required:
+        - id
+        - nombre
+        - costoIngredientes
+        - costoEmpaque
+        - otrosCostos
+        - cantidad
+        - margenGanancia
+        - lineas
+
+    CosteoLinea:
+      type: object
+      properties:
+        id:
+          type: integer
+        ingredienteId:
+          type: integer
+        ingredienteNombre:
+          type: string
+        ingredienteUnidad:
+          type: string
+        cantidadUsada:
+          type: number
+        costoUnitario:
+          type: number
+        costo:
+          type: number
+      required:
+        - id
+        - ingredienteId
+        - ingredienteNombre
+        - ingredienteUnidad
+        - cantidadUsada
+        - costoUnitario
+        - costo
+
+    CreateCosteoBody:
+      type: object
+      properties:
+        nombre:
+          type: string
+        costoIngredientes:
+          type: number
+        costoEmpaque:
+          type: number
+        otrosCostos:
+          type: number
+        cantidad:
+          type: integer
+        margenGanancia:
+          type: number
+        lineas:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateCosteoLineaBody"
+      required:
+        - nombre
+
+    CreateCosteoLineaBody:
+      type: object
+      properties:
+        ingredienteId:
+          type: integer
+        cantidadUsada:
+          type: number
+      required:
+        - ingredienteId
+        - cantidadUsada
+
+    Ingrediente:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        marca:
+          type: string
+          nullable: true
+        unidad:
+          type: string
+        cantidadCompra:
+          type: number
+        precioCompra:
+          type: number
+        costoUnitario:
+          type: number
+        stockActual:
+          type: number
+        stockMinimo:
+          type: number
+          nullable: true
+        notas:
+          type: string
+          nullable: true
+      required:
+        - id
+        - nombre
+        - unidad
+        - cantidadCompra
+        - precioCompra
+        - costoUnitario
+        - stockActual
+
+    CreateIngredienteBody:
+      type: object
+      properties:
+        nombre:
+          type: string
+        marca:
+          type: string
+          nullable: true
+        unidad:
+          type: string
+        cantidadCompra:
+          type: number
+        precioCompra:
+          type: number
+        stockActual:
+          type: number
+        stockMinimo:
+          type: number
+          nullable: true
+        notas:
+          type: string
+          nullable: true
+      required:
+        - nombre
+        - unidad
+        - cantidadCompra
+        - precioCompra
+
+    AjustarStockBody:
+      type: object
+      properties:
+        delta:
+          type: number
+          description: Amount to add (positive) or remove (negative) from stock
+      required:
+        - delta
+
+    FechaBloqueada:
+      type: object
+      properties:
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        motivo:
+          type: string
+          nullable: true
+      required:
+        - id
+        - fecha
+
+    CreateFechaBloqueadaBody:
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+        motivo:
+          type: string
+          nullable: true
+      required:
+        - fecha
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1 }
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        metadata:
+          $ref: '#/components/schemas/UploadUrlRequest'
+
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+
+    CreateCompraBody:
+      type: object
+      properties:
+        nombre:
+          type: string
+        cantidad:
+          type: string
+          nullable: true
+        comprado:
+          type: boolean
+        notas:
+          type: string
+          nullable: true
+      required:
+        - nombre
+
+    DashboardResumen:
+      type: object
+      properties:
+        pedidosActivos:
+          type: integer
+        pedidosCompletados:
+          type: integer
+        totalPendienteCobrar:
+          type: number
+        totalVentas:
+          type: number
+        pedidosHoy:
+          type: integer
+      required:
+        - pedidosActivos
+        - pedidosCompletados
+        - totalPendienteCobrar
+        - totalVentas
+        - pedidosHoy
+
+    CalendarioDia:
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+        pedidos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pedido"
+      required:
+        - fecha
+        - pedidos
