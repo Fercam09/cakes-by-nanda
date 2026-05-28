@@ -1,0 +1,15 @@
+{
+  "name": "CAKES - By: Nanda",
+  "short_name": "CAKES",
+  "description": "Pedidos y producción de mini pasteles hechos con amor por Nanda.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8F2EA",
+  "theme_color": "#F8F2EA",
+  "icons": [
+    { "src": "logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
